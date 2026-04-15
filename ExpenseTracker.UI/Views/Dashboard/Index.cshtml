@@ -1,0 +1,204 @@
+﻿@using Newtonsoft.Json
+@using System.Collections.Generic
+
+@{
+    ViewBag.Title = "Dashboard";
+
+    dynamic model = Model;
+
+    decimal total = 0;
+
+    var monthly = new List<dynamic>();
+    var category = new List<dynamic>();
+    var recent = new List<dynamic>();
+
+    string fromDate = Request["fromDate"];
+    string toDate = Request["toDate"];
+
+    try { total = model?.total != null ? (decimal)model.total : 0; } catch { }
+
+    try { foreach (var m in model?.monthly) { monthly.Add(m); } } catch { }
+    try { foreach (var c in model?.category) { category.Add(c); } } catch { }
+    try { foreach (var r in model?.recent) { recent.Add(r); } } catch { }
+}
+
+<h2 class="mb-4">📊 Dashboard</h2>
+
+<!-- FILTER -->
+<form method="get" class="mb-4 d-flex gap-2">
+
+    <input type="date" name="fromDate" value="@fromDate"
+           class="form-control" style="max-width:200px;" />
+
+    <input type="date" name="toDate" value="@toDate"
+           class="form-control" style="max-width:200px;" />
+
+    <button type="submit" class="btn btn-primary">Filter</button>
+
+</form>
+
+<!-- SUMMARY -->
+<div class="row mb-4">
+
+    <div class="col-md-4">
+        <div class="card text-white bg-primary p-3">
+            <h5>Total Expense</h5>
+            <h3>₹ @total</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-success p-3">
+            <h5>This Month</h5>
+            <h3>
+                ₹ @(
+                    monthly.Count > 0
+                    ? monthly.Sum(x => {
+                        try { return (decimal)(x.total ?? 0); } catch { return 0; }
+                    })
+                    : 0
+                )
+            </h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-danger p-3">
+            <h5>Top Category</h5>
+            <h3>
+                @(
+                    category.Count > 0
+                    ? category.OrderByDescending(x => (decimal)(x.total ?? 0)).First().category
+                    : "N/A"
+                )
+            </h3>
+        </div>
+    </div>
+
+</div>
+
+<!-- PIE CHART -->
+<div class="card p-4 mb-4">
+    <h5>Category Wise Expenses</h5>
+
+    <div style="width:300px; height:300px; margin:auto;">
+        <canvas id="categoryChart"></canvas>
+    </div>
+</div>
+
+<!-- MONTHLY CHART -->
+<div class="card p-4 mb-4">
+    <h5>Monthly Expenses</h5>
+
+    <canvas id="monthlyChart" style="height:300px;"></canvas>
+</div>
+
+<!-- RECENT -->
+<div class="card p-4">
+    <h5>Recent Transactions</h5>
+
+    <table class="table table-hover mt-3">
+
+        <thead style="background:#343a40; color:white;">
+            <tr>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @if (recent.Count > 0)
+            {
+                foreach (var item in recent)
+                {
+                    <tr>
+                        <td>
+                            <span style="
+                                padding:5px 10px;
+                                border-radius:20px;
+                                color:white;
+                                background:
+                                    @(item.categoryName == "Fuel" ? "#ff9800" :
+                                      item.categoryName == "Food" ? "#4caf50" :
+                                      item.categoryName == "Shopping" ? "#2196f3" :
+                                      item.categoryName == "Bills" ? "#f44336" :
+                                      item.categoryName == "Travel" ? "#9c27b0" :
+                                      "#607d8b");
+                            ">
+                                @(item.categoryName ?? "N/A")
+                            </span>
+                        </td>
+
+                        <td>₹ @(item.amount ?? 0)</td>
+
+                        <td>
+                            @(
+                                item.expenseDate != null
+                                ? ((DateTime)item.expenseDate).ToString("dd-MM-yyyy")
+                                : "-"
+                            )
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center p-3">
+                        No recent transactions
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+</div>
+
+<!-- CHARTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // PIE CHART
+    var data = @Html.Raw(JsonConvert.SerializeObject(category));
+
+    if (data && data.length > 0) {
+
+        var labels = data.map(x => x.category);
+        var values = data.map(x => x.total || 0);
+
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values
+                }]
+            }
+        });
+    }
+
+    // MONTHLY CHART
+    var monthlyData = @Html.Raw(JsonConvert.SerializeObject(monthly));
+
+    if (monthlyData && monthlyData.length > 0) {
+
+        var monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+        var labels = monthlyData.map(x => monthNames[x.month - 1]);
+        var values = monthlyData.map(x => x.total || 0);
+
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Monthly Expenses',
+                    data: values
+                }]
+            }
+        });
+    }
+</script>

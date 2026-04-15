@@ -1,0 +1,144 @@
+﻿@model ExpenseTracker.UI.Models.LoginViewModel
+
+<style>
+    body {
+        background: linear-gradient(135deg, #eaf2ff, #f6f9ff);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .login-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 85vh;
+        padding: 20px;
+    }
+
+    .login-card {
+        display: flex;
+        width: 850px;
+        max-width: 100%;
+        border-radius: 18px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    }
+
+    /* LEFT PANEL */
+    .login-left {
+        flex: 1;
+        padding: 50px 40px;
+        color: white;
+        background: linear-gradient(135deg, #5b8cff, #6fc3ff);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .login-left h2 {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .login-left p {
+            opacity: 0.9;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+    /* RIGHT PANEL */
+    .login-right {
+        flex: 1;
+        padding: 40px;
+        background: #ffffff;
+    }
+
+        .login-right h3 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+    }
+
+        .form-control:focus {
+            border-color: #5b8cff;
+            box-shadow: none;
+        }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #5b8cff, #4facfe);
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+    /* MOBILE */
+    @@media (max-width: 768px) {
+        .login-card {
+            flex-direction: column;
+        }
+
+        .login-left {
+            text-align: center;
+            padding: 30px;
+        }
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+
+        <!-- LEFT SIDE -->
+        <div class="login-left">
+            <h2>💰 Expense Tracker</h2>
+
+            <h5>Take Control of Your Expenses</h5>
+
+            <p>Track smarter.</p>
+            <p>Spend better</p>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="login-right">
+
+            <h3>Login</h3>
+
+            @using (Html.BeginForm())
+            {
+                <div class="mb-3">
+                    <label>Email</label>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter email" })
+                </div>
+
+                <div class="mb-3">
+                    <label>Password</label>
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Enter password" })
+                </div>
+
+                <button class="btn btn-primary w-100">Login</button>
+
+                <div class="text-center mt-3">
+                    <small>
+                        Don't have account?
+                        @Html.ActionLink("Register", "Register", "Account")
+                    </small>
+                </div>
+            }
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger mt-3 text-center">
+                    @ViewBag.Error
+                </div>
+            }
+        </div>
+
+    </div>
+</div>

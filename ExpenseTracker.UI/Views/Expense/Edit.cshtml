@@ -1,0 +1,35 @@
+﻿@model ExpenseTracker.UI.Models.ExpenseViewModel
+
+<div class="card p-4 col-md-6 mx-auto">
+    <h3>Edit Expense</h3>
+
+    @using (Html.BeginForm())
+    {
+        @Html.HiddenFor(m => m.Id)
+
+<div class="mb-3">
+    <label>Category</label>
+    @Html.DropDownListFor(m => m.CategoryId,
+        (List<SelectListItem>)ViewBag.Categories,
+        "Select Category",
+        new { @class = "form-control" })
+</div>
+
+        <div class="mb-3">
+            <label>Amount</label>
+            @Html.TextBoxFor(m => m.Amount, new { @class = "form-control" })
+        </div>
+
+        <div class="mb-3">
+            <label>Date</label>
+            @Html.TextBoxFor(m => m.ExpenseDate, new { @class = "form-control", type = "date" })
+        </div>
+
+        <div class="mb-3">
+            <label>Notes</label>
+            @Html.TextBoxFor(m => m.Notes, new { @class = "form-control" })
+        </div>
+
+        <button class="btn btn-primary w-100">Update</button>
+    }
+</div>

@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>@ViewBag.Title - Expense Tracker</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f4f6f9;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: linear-gradient(90deg, #5b8cff, #4facfe);
+            padding: 14px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .navbar-brand {
+            color: #fff !important;
+            font-weight: 600;
+        }
+
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: #ffe082 !important;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            width: 220px;
+            height: 100%;
+            background: linear-gradient(180deg, #0f2027, #203a43, #2c5364);
+            padding-top: 20px;
+            color: white;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #ddd;
+            padding: 12px 20px;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.1);
+            color: #00d4ff;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+        }
+
+        /* 🔄 LOADER */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ccc;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 🔔 TOAST */
+        #toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 250px;
+            padding: 12px 18px;
+            border-radius: 8px;
+            color: white;
+            display: none;
+            z-index: 9999;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+    </style>
+</head>
+
+<body>
+
+    @if (Session["Token"] == null)
+    {
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="/">💰 Expense Tracker</a>
+
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Account/Login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Account/Register">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container mt-4">
+            @RenderBody()
+        </div>
+    }
+    else
+    {
+        <!-- SIDEBAR -->
+        <div class="sidebar d-flex flex-column justify-content-between">
+
+            <!-- TOP MENU -->
+            <div>
+                <h4 class="text-center mb-4">💰 Expense</h4>
+
+                <a href="/Dashboard/Index">📊 Dashboard</a>
+                <a href="/Expense/Index">💸 Expenses</a>
+            </div>
+
+            <!-- 🔥 PROFILE SECTION -->
+            <div style="padding:15px; border-top:1px solid rgba(255,255,255,0.1);">
+
+                <div class="d-flex align-items-center">
+
+                    <!-- CIRCLE AVATAR -->
+                    <div style="
+                width:45px;
+                height:45px;
+                border-radius:50%;
+                background:#4facfe;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-weight:bold;
+                color:white;
+                margin-right:10px;
+            ">
+                        @((Session["UserName"] ?? "U").ToString().Substring(0,1).ToUpper())
+                    </div>
+
+                    <!-- USER INFO -->
+                    <div style="flex-grow:1;">
+                        <div style="font-size:14px; font-weight:500;">
+                            @(Session["UserName"] ?? "User")
+                        </div>
+                        <div style="font-size:12px; color:#ccc;">
+                            @(Session["Email"] ?? "user@mail.com")
+                        </div>
+                    </div>
+
+                    <!-- DROPDOWN -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm text-white" data-bs-toggle="dropdown">⋮</button>
+
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/Profile/Index">👤 Profile</a></li>
+                            <li><a class="dropdown-item" href="/Home/About">ℹ️ About</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="/Account/Logout">🚪 Logout</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="main-content">
+            @RenderBody()
+        </div>
+    }
+
+    <!-- 🔄 LOADER -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- 🔔 TOAST -->
+    <div id="toast"></div>
+
+    <script>
+        function showLoader() {
+            document.getElementById("loader").style.display = "flex";
+        }
+
+        function showToast(message, type = "success") {
+            var toast = document.getElementById("toast");
+
+            toast.innerText = message;
+            toast.style.display = "block";
+
+            if (type === "success") {
+                toast.style.background = "#28a745";
+            } else if (type === "error") {
+                toast.style.background = "#dc3545";
+            }
+
+            toast.style.opacity = "1";
+            toast.style.transform = "translateY(0)";
+
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(-20px)";
+            }, 2500);
+
+            setTimeout(() => {
+                toast.style.display = "none";
+            }, 3000);
+        }
+
+        window.onload = function () {
+            var successMsg = '@TempData["Success"]';
+            var errorMsg = '@TempData["Error"]';
+
+            if (successMsg && successMsg !== '') {
+                showToast(successMsg, "success");
+            }
+
+            if (errorMsg && errorMsg !== '') {
+                showToast(errorMsg, "error");
+            }
+        }
+    </script>
+    <script>
+        function handleUnauthorized() {
+            showToast("Session expired. Please login again.", "error");
+
+            setTimeout(function () {
+                window.location.href = "/Account/Logout";
+            }, 1500);
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

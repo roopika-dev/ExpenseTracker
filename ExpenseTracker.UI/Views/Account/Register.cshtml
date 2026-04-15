@@ -1,0 +1,149 @@
+﻿@model ExpenseTracker.UI.Models.RegisterViewModel
+
+<style>
+    body {
+        background: linear-gradient(135deg, #eaf2ff, #f6f9ff);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .register-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 85vh;
+        padding: 20px;
+    }
+
+    .register-card {
+        display: flex;
+        width: 850px;
+        max-width: 100%;
+        border-radius: 18px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    }
+
+    /* LEFT PANEL */
+    .register-left {
+        flex: 1;
+        padding: 50px 40px;
+        color: white;
+        background: linear-gradient(135deg, #5b8cff, #6fc3ff);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .register-left h2 {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .register-left p {
+            opacity: 0.9;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+    /* RIGHT PANEL */
+    .register-right {
+        flex: 1;
+        padding: 40px;
+        background: #ffffff;
+    }
+
+        .register-right h3 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+    }
+
+        .form-control:focus {
+            border-color: #5b8cff;
+            box-shadow: none;
+        }
+
+    .btn-success {
+        background: linear-gradient(45deg, #5b8cff, #4facfe); /* SAME AS LOGIN */
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        color: white;
+    }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
+    /* MOBILE */
+    @@media (max-width: 768px) {
+        .register-card {
+            flex-direction: column;
+        }
+
+        .register-left {
+            text-align: center;
+            padding: 30px;
+        }
+    }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-card">
+
+        <!-- LEFT SIDE -->
+        <div class="register-left">
+            <h2>💰 Expense Tracker</h2>
+
+            <h5>Create Your Account</h5>
+
+            <p>Start tracking your expenses today.</p>
+
+            <p>
+                Manage your finances, control spending,
+                and achieve your financial goals effortlessly.
+            </p>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="register-right">
+
+            <h3>Register</h3>
+
+            @using (Html.BeginForm())
+            {
+                <div class="mb-3">
+                    <label>Name</label>
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Enter name" })
+                </div>
+
+                <div class="mb-3">
+                    <label>Email</label>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter email" })
+                </div>
+
+                <div class="mb-3">
+                    <label>Password</label>
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Enter password" })
+                </div>
+
+                <button class="btn btn-success w-100">Register</button>
+
+                <div class="text-center mt-3">
+                    <small>
+                        Already have account?
+                        @Html.ActionLink("Login", "Login", "Account")
+                    </small>
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>

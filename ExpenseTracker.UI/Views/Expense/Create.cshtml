@@ -1,0 +1,34 @@
+﻿@model ExpenseTracker.UI.Models.ExpenseViewModel
+
+<h2>Add Expense</h2>
+
+@using (Html.BeginForm())
+{
+    <div>
+        <label>Category</label>
+        @Html.DropDownListFor(m => m.CategoryId,
+            (List<SelectListItem>)ViewBag.Categories,
+            "Select Category",
+            new { @class = "form-control" })
+    </div>
+
+    <div>
+        <label>Amount</label>
+        @Html.TextBoxFor(m => m.Amount, new { type = "number", @class = "form-control", required = "required" })
+    </div>
+
+    <div>
+        <label>Date</label>
+        @Html.TextBoxFor(m => m.ExpenseDate, "{0:yyyy-MM-dd}",
+            new { type = "date", @class = "form-control", required = "required" })
+    </div>
+
+    <div>
+        <label>Notes</label>
+        @Html.TextBoxFor(m => m.Notes, new { @class = "form-control" })
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-primary">Save</button>
+}

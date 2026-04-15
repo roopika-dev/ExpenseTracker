@@ -5,7 +5,6 @@ A full-stack Expense Tracker application built using ASP.NET MVC, Web API (JWT A
 ---
 
 ## 🚀 Features
-
 - 🔐 User Authentication (JWT आधारित login/register)
 - 💸 Expense CRUD (Add, Edit, Delete, View)
 - 📊 Dashboard with Charts (Chart.js)

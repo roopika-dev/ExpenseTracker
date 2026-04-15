@@ -32,6 +32,31 @@ UI (MVC) → API → Services → Database
 
 ---
 
+## 📸 Screenshots
+
+### 🔐 Login
+![Login](screenshots/Login.png)
+
+### 📊 Dashboard
+![Dashboard](screenshots/Dashboard%201.png)
+
+### 📊 Dashboard (Alt)
+![Dashboard2](screenshots/Dashboard%202.png)
+
+### 💸 Expenses
+![Expenses](screenshots/Expense%20List%20With%20Crud.png)
+
+### ➕ Add Expense
+![Add Expense](screenshots/AddExpense.png)
+
+### 👤 Profile
+![Profile](screenshots/Profile.png)
+
+### 📝 Register
+![Register](screenshots/Register.png)
+
+
+
 ## 📌 Future Enhancements
 
 - Budget tracking 💰

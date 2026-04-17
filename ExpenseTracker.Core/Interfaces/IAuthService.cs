@@ -6,5 +6,6 @@ namespace ExpenseTracker.Core.Interfaces
     {
         Task<string> Register(RegisterDto dto);
         Task<string> Login(LoginDto dto);
+        Task<string> ChangePassword(int userId, ChangePasswordDto dto);
     }
 }

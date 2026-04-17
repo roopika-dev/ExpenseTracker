@@ -1,8 +1,10 @@
 ﻿using ExpenseTracker.UI.Models;
 using ExpenseTracker.UI.Services;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -13,36 +15,42 @@ namespace ExpenseTracker.UI.Controllers
         private ApiService _api = new ApiService();
 
         // ===================== LIST =====================
-        public async Task<ActionResult> Index(string category)
+        public async Task<ActionResult> Index(string category, int page = 1, int pageSize = 5)
         {
             var token = Session["Token"]?.ToString();
 
             if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login", "Account");
 
-            var response = await _api.GetAsync("Expense", token);
+            var response = await _api.GetAsync($"Expense?page={page}&pageSize={pageSize}", token);
 
-            if (string.IsNullOrEmpty(response) || !response.Trim().StartsWith("["))
-                return View(new List<ExpenseViewModel>());
+            // ✅ FIX dynamic issue
+            var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response);
 
-            var data = JsonConvert.DeserializeObject<List<ExpenseViewModel>>(response);
+            var dataJson = result["data"].ToString();
 
-            // ✅ APPLY FILTER
+            var data = JsonConvert.DeserializeObject<List<ExpenseViewModel>>(dataJson);
+
+            // ✅ FILTER
             if (!string.IsNullOrEmpty(category))
             {
-                data = data
-                   .Where(x => x.CategoryName == category)
-                    .ToList();
+                data = data.Where(x => x.CategoryName == category).ToList();
             }
 
-            // ✅ ADD ICON + COLOR
+            // ✅ STYLE
             AddCategoryStyles(data);
 
-            // ✅ SEND CATEGORY LIST FOR DROPDOWN
-            ViewBag.FilterCategories = data
-                .Select(x => x.CategoryName)
-                .Distinct()
-                .ToList();
+            // ✅ DROPDOWN
+            ViewBag.FilterCategories = data.Select(x => x.CategoryName).Distinct().ToList();
+
+            // ✅ PAGINATION
+            var totalCount = Convert.ToInt32(result["totalCount"]);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+            // ✅ NEW (IMPORTANT)
+            ViewBag.PageSize = pageSize;
 
             return View(data);
         }
@@ -132,21 +140,6 @@ namespace ExpenseTracker.UI.Controllers
             return RedirectToAction("Index");
         }
 
-        // ===================== COMMON CATEGORY METHOD =====================
-        private void SetCategories()
-        {
-            ViewBag.Categories = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "1", Text = "Food" },
-                new SelectListItem { Value = "2", Text = "Fuel" },
-                new SelectListItem { Value = "3", Text = "Travel" },
-                new SelectListItem { Value = "4", Text = "Bills" },
-                new SelectListItem { Value = "5", Text = "Shopping" },
-                new SelectListItem { Value = "6", Text = "Juices" },
-                new SelectListItem { Value = "7", Text = "Chai" },
-                new SelectListItem { Value = "8", Text = "Smoking" }
-            };
-        }
 
         private async Task LoadCategories()
         {
@@ -218,6 +211,16 @@ namespace ExpenseTracker.UI.Controllers
                         break;
                 }
             }
+        }
+
+        public ActionResult Export()
+        {
+            var token = Session["Token"]?.ToString();
+
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            return Redirect("https://localhost:7138/api/Expense/export?token=" + token);
         }
     }
 }

@@ -4,34 +4,122 @@
     ViewBag.Title = "Expenses";
 }
 
-<div style="padding:20px; background:#f5f7fb; border-radius:12px;">
+<div style="padding: 20px; background: #f5f7fb; border-radius: 12px; overflow-x: auto;">
 
-    <h2 style="margin-bottom:15px;">Expenses</h2>
+    <!-- 🔥 HEADER CARD -->
+    <div style="
+    background: linear-gradient(135deg, #1e1e2f, #3a0ca3);
+    padding:25px;
+    border-radius:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+    margin-bottom:25px;
+    color:white;
+">
 
-    <!-- ADD BUTTON -->
-    <div style="margin-bottom:15px;">
-        <a href="/Expense/Create"
-           style="padding:8px 15px; background:#5b8cff; color:white; border-radius:6px; text-decoration:none;">
-            + Add Expense
-        </a>
+        <!-- TITLE + BUTTONS -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+
+            <div>
+                <h2 style="margin:0; font-weight:600;">💸 Expenses</h2>
+                <p style="margin:5px 0 0; opacity:0.85; font-size:14px;">
+                    Manage your daily spending smartly
+                </p>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+
+                <a href="/Expense/Create"
+                   style="
+                    padding:10px 18px;
+                    background:white;
+                    color:#3a0ca3;
+                    border-radius:10px;
+                    text-decoration:none;
+                    font-weight:600;
+                    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+               ">
+                    + Add
+                </a>
+
+                <a href="/Expense/Export"
+                   style="
+                    padding:10px 18px;
+                    background:#00c853;
+                    color:white;
+                    border-radius:10px;
+                    text-decoration:none;
+                    font-weight:600;
+                    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+               ">
+                    ⬇ Export
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- FILTER CARD -->
+        <form method="get"
+              style="
+            background:white;
+            margin-top:20px;
+            padding:15px;
+            border-radius:12px;
+            display:flex;
+            gap:20px;
+            flex-wrap:wrap;
+            align-items:center;
+            box-shadow:0 5px 15px rgba(0,0,0,0.15);
+          ">
+
+            <!-- CATEGORY -->
+            <div>
+                <label style="font-size:12px; color:#666;">Category</label><br />
+                <select name="category"
+                        onchange="this.form.submit()"
+                        class="form-control"
+                        style="width:200px;">
+                    <option value="">All Categories</option>
+
+                    @foreach (var c in ViewBag.FilterCategories)
+                    {
+                        <option value="@c" @(Request["category"] == c ? "selected" : "")>
+                            @c
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <!-- PAGE SIZE -->
+            <div>
+                <label style="font-size:12px; color:#666;">Items</label><br />
+                <select name="pageSize"
+                        onchange="this.form.submit()"
+                        class="form-control"
+                        style="width:120px;">
+                    <option value="5" @(ViewBag.PageSize == 5 ? "selected" : "")>5</option>
+                    <option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</option>
+                    <option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</option>
+                </select>
+            </div>
+
+        </form>
+
     </div>
 
-    <!-- FILTER -->
-    <form method="get" style="margin-bottom:15px;">
-        <select name="category" onchange="this.form.submit()" class="form-control" style="width:220px;">
-            <option value="">All Categories</option>
+        </form>
 
-            @foreach (var c in ViewBag.FilterCategories)
-            {
-                <option value="@c" @(Request["category"] == c ? "selected" : "")>
-                    @c
-                </option>
-            }
-        </select>
-    </form>
+    </div>
 
-    <!-- TABLE -->
-    <table style="width:100%; border-collapse:collapse; background:white; border-radius:10px; overflow:hidden;">
+    <!-- 🔥 TABLE -->
+    <table style="
+        width:100%;
+        border-collapse:collapse;
+        background:white;
+        border-radius:10px;
+        overflow:hidden;
+        box-shadow:0 4px 12px rgba(0,0,0,0.05);
+    ">
         <thead style="background:#2c3e50; color:white;">
             <tr>
                 <th style="padding:12px;">Category</th>
@@ -92,6 +180,32 @@
             }
         </tbody>
     </table>
+
+    <!-- 🔥 PAGINATION -->
+    <div style="margin-top:20px; text-align:center;">
+
+        @if (ViewBag.CurrentPage > 1)
+        {
+            <a href="/Expense/Index?page=@(ViewBag.CurrentPage - 1)&pageSize=@ViewBag.PageSize"
+               class="btn btn-secondary">⬅</a>
+        }
+
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <a href="/Expense/Index?page=@i&pageSize=@ViewBag.PageSize"
+               class="btn @(i == ViewBag.CurrentPage ? "btn-primary" : "btn-light")"
+               style="margin:2px;">
+                @i
+            </a>
+        }
+
+        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+        {
+            <a href="/Expense/Index?page=@(ViewBag.CurrentPage + 1)&pageSize=@ViewBag.PageSize"
+               class="btn btn-secondary">➡</a>
+        }
+
+    </div>
 
 </div>
 

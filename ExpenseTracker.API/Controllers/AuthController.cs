@@ -16,16 +16,19 @@ namespace ExpenseTracker.API.Controllers
         private readonly ApplicationDbContext _context;
         private readonly JwtHelper _jwt;
 
+
         public AuthController(IAuthService authService, ApplicationDbContext context, JwtHelper jwt)
         {
             _authService = authService;
             _context = context;
             _jwt = jwt;
         }
-
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var result = await _authService.Register(dto);
             return Ok(result);
         }
@@ -33,6 +36,9 @@ namespace ExpenseTracker.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var result = await _authService.Login(dto);
 
             if (!int.TryParse(result, out int userId))
@@ -93,31 +99,12 @@ namespace ExpenseTracker.API.Controllers
 
             var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
 
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            var result = await _authService.ChangePassword(userId, dto);
 
-            if (user == null)
-                return NotFound();
-
-            // 🔥 USE SAME HASH METHOD
-            var oldHashed = HashPassword(dto.OldPassword);
-
-            if (user.PasswordHash != oldHashed)
-                return BadRequest(new { message = "Old password is incorrect" });
-
-            // 🔥 UPDATE WITH SAME HASH
-            user.PasswordHash = HashPassword(dto.NewPassword);
-
-            await _context.SaveChangesAsync();
+            if (result != "Success")
+                return BadRequest(new { message = result });
 
             return Ok(new { message = "Password changed successfully" });
-        }
-        private string HashPassword(string password)
-        {
-            using var sha256 = System.Security.Cryptography.SHA256.Create();
-            var bytes = System.Text.Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-
-            return Convert.ToBase64String(hash);
         }
     }
 }

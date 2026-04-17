@@ -62,5 +62,24 @@ namespace ExpenseTracker.Infrastructure.Services
 
             return Convert.ToBase64String(hash);
         }
+
+        public async Task<string> ChangePassword(int userId, ChangePasswordDto dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null)
+                return "User not found";
+
+            var oldHashed = HashPassword(dto.OldPassword);
+
+            if (user.PasswordHash != oldHashed)
+                return "Old password is incorrect";
+
+            user.PasswordHash = HashPassword(dto.NewPassword);
+
+            await _context.SaveChangesAsync();
+
+            return "Success";
+        }
     }
 }

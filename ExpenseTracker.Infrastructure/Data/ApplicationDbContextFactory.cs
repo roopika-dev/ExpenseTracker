@@ -10,8 +10,9 @@ namespace ExpenseTracker.Infrastructure.Data
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
             optionsBuilder.UseSqlServer(
-                "Server=192.168.1.10\\SQL2019;Database=ExpenseTrackerDB;User Id=sa;Password=ALlogic@24;TrustServerCertificate=True;"
-            );
+    Environment.GetEnvironmentVariable("DB_CONNECTION")
+    ?? "Server=localhost;Database=ExpenseTrackerDB;Trusted_Connection=True;TrustServerCertificate=True;"
+);
 
             return new ApplicationDbContext(optionsBuilder.Options);
         }

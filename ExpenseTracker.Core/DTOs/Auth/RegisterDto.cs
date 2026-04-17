@@ -1,9 +1,15 @@
-﻿namespace ExpenseTracker.Core.DTOs.Auth
+﻿using System.ComponentModel.DataAnnotations;
+
+public class RegisterDto
 {
-    public class RegisterDto
-    {
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    [Required]
+    public string Name { get; set; }
+
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; }
+
+    [Required]
+    [MinLength(6)]
+    public string Password { get; set; }
 }
